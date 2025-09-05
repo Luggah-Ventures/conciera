@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getSupabaseServerClient } from '@/lib/supabase/server'
+import { getSupabaseServerClientAction } from '@/lib/supabase/server'
 
 export async function GET(req: Request) {
   const url = new URL(req.url)
@@ -10,7 +10,7 @@ export async function GET(req: Request) {
   }
 
   try {
-    const supabase = await getSupabaseServerClient()
+    const supabase = await getSupabaseServerClientAction()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
 
     if (error) {

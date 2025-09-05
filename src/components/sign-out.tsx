@@ -1,11 +1,13 @@
-// e.g., app/components/sign-out.tsx
+// src/components/sign-out.tsx
+import { getSupabaseServerClientAction } from '@/lib/supabase/server'
+
 export function SignOutButton() {
   async function signOut() {
     'use server'
-    const { getSupabaseServerClient } = await import('@/lib/supabase/server')
-    const supabase = await getSupabaseServerClient()
+    const supabase = await getSupabaseServerClientAction()
     await supabase.auth.signOut()
   }
+
   return (
     <form action={signOut}>
       <button className="text-sm underline">Sign out</button>

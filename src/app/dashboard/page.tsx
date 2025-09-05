@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation'
-import { getSupabaseServerClient } from '@/lib/supabase/server'
+import { getSupabaseServerClientRSC } from '@/lib/supabase/server'
 import { SignOutButton } from '@/components/sign-out'
 
 export default async function DashboardPage() {
-  const supabase = await getSupabaseServerClient()
+  const supabase = await getSupabaseServerClientRSC()
   const {
     data: { user },
   } = await supabase.auth.getUser()

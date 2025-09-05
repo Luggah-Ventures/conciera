@@ -1,19 +1,16 @@
 // src/app/auth/sign-in/page.tsx
 import { redirect } from 'next/navigation'
+import { getSupabaseServerClientAction } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
 
-// ❌ export async function signIn(...) { ... }
 async function signIn(formData: FormData) {
-  // ✅ no 'export'
   'use server'
   const email = String(formData.get('email') || '').trim()
   if (!email) return
 
-  const { getSupabaseServerClient } = await import('@/lib/supabase/server')
-  const supabase = await getSupabaseServerClient()
-
-  await supabase.auth.signInWithOtp({
+  const supabase = await getSupabaseServerClientAction()
+  const { error } = await supabase.auth.signInWithOtp({
     email,
     options: {
       emailRedirectTo: `${
@@ -21,6 +18,7 @@ async function signIn(formData: FormData) {
       }/auth/callback`,
     },
   })
+  if (error) throw error
 
   redirect('/auth/check-email')
 }

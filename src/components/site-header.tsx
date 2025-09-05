@@ -1,9 +1,10 @@
+// src/components/site-header.tsx
 import Link from 'next/link'
-import { getSupabaseServerClient } from '@/lib/supabase/server'
+import { getSupabaseServerClientRSC } from '@/lib/supabase/server'
 import { SignOutButton } from '@/components/sign-out'
 
-export async function SiteHeader() {
-  const supabase = await getSupabaseServerClient()
+export default async function SiteHeader() {
+  const supabase = await getSupabaseServerClientRSC() // read-only at render
   const {
     data: { user },
   } = await supabase.auth.getUser()

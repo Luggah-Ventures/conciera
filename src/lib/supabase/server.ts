@@ -1,8 +1,8 @@
 // src/lib/supabase/server.ts
 import {
   createServerClient,
-  type CookieOptions as SupaCookieOptions,
   type CookieMethodsServer,
+  type CookieOptions as SupaCookieOptions,
 } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
@@ -10,28 +10,56 @@ type CookieOptions = SupaCookieOptions & {
   sameSite?: 'lax' | 'strict' | 'none'
 }
 
-export async function getSupabaseServerClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  if (!url || !key) throw new Error('Supabase env vars missing')
+function requireEnv(name: string) {
+  const v = process.env[name]
+  if (!v) throw new Error(`Missing env: ${name}`)
+  return v
+}
 
-  // Next 15: cookies() is async
-  const cookieStore = await cookies()
+const url = requireEnv('NEXT_PUBLIC_SUPABASE_URL')
+const key = requireEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY')
 
+/**
+ * Use ONLY inside Server Actions or Route Handlers.
+ * These contexts may MODIFY cookies in Next.js.
+ */
+export async function getSupabaseServerClientAction() {
+  const store = await cookies()
   const cookieMethods = {
     get(name: string) {
-      // return raw value string or undefined
-      return cookieStore.get(name)?.value
+      return store.get(name)?.value
     },
     set(name: string, value: string, options?: CookieOptions) {
-      cookieStore.set({ name, value, ...(options ?? {}) })
+      // ✅ Allowed here (Server Action / Route Handler)
+      store.set({ name, value, ...(options ?? {}) })
     },
     remove(name: string, options?: CookieOptions) {
-      cookieStore.set({ name, value: '', ...(options ?? {}) })
+      // ✅ Allowed here (Server Action / Route Handler)
+      store.set({ name, value: '', ...(options ?? {}) })
     },
   } as unknown as CookieMethodsServer
 
-  return createServerClient(url, key, {
-    cookies: cookieMethods,
-  })
+  return createServerClient(url, key, { cookies: cookieMethods })
+}
+
+/**
+ * Use in Server Components (pages/layouts) during render.
+ * DO NOT modify cookies here: set/remove are NO-OPs on purpose.
+ */
+export async function getSupabaseServerClientRSC() {
+  const store = await cookies() // read-only in RSC
+  const cookieMethods = {
+    get(name: string) {
+      return store.get(name)?.value
+    },
+    // ⛔ IMPORTANT: never call store.set here
+    set() {
+      /* no-op in Server Components */
+    },
+    remove() {
+      /* no-op in Server Components */
+    },
+  } as unknown as CookieMethodsServer
+
+  return createServerClient(url, key, { cookies: cookieMethods })
 }

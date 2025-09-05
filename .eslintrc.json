@@ -1,0 +1,52 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "plugins": ["import"],
+  "settings": {
+    "import/resolver": {
+      "typescript": {}
+    }
+  },
+  "rules": {
+    // Catch named imports that don't exist (e.g., importing { SiteHeader } when it is default)
+    "import/named": "error",
+
+    // Never allow the legacy Supabase helper anywhere
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "@/lib/supabase/server",
+            "importNames": ["getSupabaseServerClient"],
+            "message": "Use getSupabaseServerClientRSC() in pages/layouts and getSupabaseServerClientAction() inside \"use server\" only."
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      // Render-only files: pages, layouts, and generic components
+      "files": ["src/app/**/page.tsx", "src/app/**/layout.tsx", "src/components/**/*.{ts,tsx}"],
+      "excludedFiles": [
+        // Allow Action client inside the dedicated server-action component
+        "src/components/sign-out.tsx"
+      ],
+      "rules": {
+        // Don’t allow Action client to be imported in render files
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@/lib/supabase/server",
+                "importNames": ["getSupabaseServerClientAction"],
+                "message": "Do not import the Action client in render files. Use getSupabaseServerClientRSC() here and call the Action client inside a \"use server\" function."
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

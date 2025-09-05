@@ -1,0 +1,15 @@
+# Prevent Cursor Agent from breaking server-side code
+protect:
+  - "src/lib/supabase/**"
+  - "src/lib/db/tasks.ts"
+  - "src/app/**/actions.ts"
+  - "supabase/**"
+
+# Keep server actions intact
+rule: Preserve all `"use server"` blocks, server action functions, and Supabase calls.
+rule: Do not rename or remove input `name` attributes (these bind to server actions).
+
+# Scope
+rule: Default to UI-only changes: Tailwind CSS, shadcn/ui components, layout, validation, accessibility.
+rule: Do not add dependencies without explicit approval.
+rule: Fix any TypeScript errors you introduce, without disabling type-checks.
