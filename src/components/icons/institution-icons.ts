@@ -1,36 +1,60 @@
+// src/components/icons/institution-icons.ts
+import type { LucideIcon } from 'lucide-react'
 import {
-  CarFront,
-  IdCard,
   Home,
+  Car,
   Landmark,
-  Activity,
-  Tv,
-  UtilityPole,
-  ShieldCheck,
-  FileText,
+  Hospital,
+  HeartPulse,
   Users,
+  Tv,
+  Bolt,
+  Building2,
+  MapPin,
+  Banknote,
+  IdCard,
+  Mail,
+  ShieldCheck,
+  Settings,
 } from 'lucide-react'
 
-export const institutionIconMap: Record<string, any> = {
-  dvla: CarFront,
-  'driving licence': IdCard,
-  council: Landmark,
-  'council tax': Landmark,
-  nhs: Activity,
-  dentist: Activity,
-  gp: Activity,
-  'tv licence': Tv,
-  utilities: UtilityPole,
-  bank: ShieldCheck,
-  hmrc: FileText,
-  clubs: Users,
+/**
+ * Map string keys (from your DB or UI) to Lucide icons.
+ * Add/rename keys here to match what you use in code or in the DB.
+ */
+export const institutionIcons: Record<string, LucideIcon> = {
+  // government & identity
+  dvla: Car,
+  hmrc: Landmark,
+  council: Building2,
+  id: IdCard,
+
+  // health
+  nhs: Hospital,
+  gp: HeartPulse,
+  dentist: HeartPulse,
+
+  // utilities & services
+  utilities: Bolt,
+  tv_licence: Tv,
+  address: Home,
+  mail: Mail,
+
+  // lifestyle / misc
+  gym: Users,
+  bank: Banknote,
+  location: MapPin,
+  security: ShieldCheck,
+  settings: Settings,
 }
 
-// helper to fetch by title safely
-export function getIconFor(title: string) {
-  const key = title.toLowerCase()
-  for (const k of Object.keys(institutionIconMap)) {
-    if (key.includes(k)) return institutionIconMap[k]
-  }
-  return Home
+/**
+ * Get a Lucide icon by key, safely typed.
+ */
+export function getInstitutionIcon(key?: string): LucideIcon | undefined {
+  if (!key) return undefined
+  return institutionIcons[key.toLowerCase()]
 }
+
+// If you prefer default export for the whole map:
+// export default institutionIcons;

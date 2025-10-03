@@ -1,3 +1,4 @@
+// src/app/onboarding/_Form.tsx
 'use client'
 
 import Image from 'next/image'
@@ -50,6 +51,8 @@ const onboardingSchema = z.object({
   adults: z.coerce.number().min(0),
   children: z.coerce.number().min(0),
   pets: z.coerce.number().min(0),
+
+  // checkboxes often post ""/undefined – we still keep them required in the output shape
   vehicle_owned: z.boolean().default(false),
   driving_licence_no: z.string().optional(),
 
@@ -63,7 +66,7 @@ const onboardingSchema = z.object({
   clubs_gymPriority: z.boolean().default(false),
 })
 
-type OnboardingSchema = z.infer<typeof onboardingSchema>
+export type FormValues = z.infer<typeof onboardingSchema>
 
 /** Simple icon resolver so each tile gets a relevant pictogram. */
 function getIconFor(title: string) {
@@ -123,7 +126,7 @@ function Tile({
   )
 }
 
-export function OnboardingForm({
+function OnboardingForm({
   institutions,
   userEmail,
   userName,
@@ -132,7 +135,7 @@ export function OnboardingForm({
   userEmail: string | null
   userName?: string | null
 }) {
-  const defaultValues: OnboardingSchema = useMemo(
+  const defaultValues: FormValues = useMemo(
     () => ({
       full_name: '',
       email: userEmail ?? '',
@@ -155,7 +158,8 @@ export function OnboardingForm({
     [userEmail]
   )
 
-  const form = useForm<OnboardingSchema>({
+  // 🧠 IMPORTANT: let RHF infer types from the resolver+schema.
+  const form = useForm({
     resolver: zodResolver(onboardingSchema),
     defaultValues,
     mode: 'onBlur',
@@ -174,9 +178,9 @@ export function OnboardingForm({
   }, [form])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header / hero */}
-      <div className="bg-gradient-to-br from-[#1E73BE] to-[#1557a0] text-white py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-white">
+      {/* Header / hero – matches landing page tone */}
+      <div className="bg-[#1E73BE] text-white py-8 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-4xl">
           <div className="mb-6 flex justify-center">
             <Image
@@ -346,11 +350,16 @@ export function OnboardingForm({
                       <FormLabel>Adults</FormLabel>
                       <FormControl>
                         <Input
-                          {...field}
                           type="number"
                           min={0}
                           className="rounded-lg"
                           name="adults"
+                          value={(field.value as number | string | undefined) ?? ''}
+                          onChange={(e) =>
+                            field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                          }
+                          onBlur={field.onBlur}
+                          ref={field.ref}
                         />
                       </FormControl>
                       <FormMessage />
@@ -365,11 +374,16 @@ export function OnboardingForm({
                       <FormLabel>Children</FormLabel>
                       <FormControl>
                         <Input
-                          {...field}
                           type="number"
                           min={0}
                           className="rounded-lg"
                           name="children"
+                          value={(field.value as number | string | undefined) ?? ''}
+                          onChange={(e) =>
+                            field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                          }
+                          onBlur={field.onBlur}
+                          ref={field.ref}
                         />
                       </FormControl>
                       <FormMessage />
@@ -384,18 +398,22 @@ export function OnboardingForm({
                       <FormLabel>Pets</FormLabel>
                       <FormControl>
                         <Input
-                          {...field}
                           type="number"
                           min={0}
                           className="rounded-lg"
                           name="pets"
+                          value={(field.value as number | string | undefined) ?? ''}
+                          onChange={(e) =>
+                            field.onChange(e.target.value === '' ? '' : Number(e.target.value))
+                          }
+                          onBlur={field.onBlur}
+                          ref={field.ref}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="vehicle_owned"
@@ -611,3 +629,6 @@ export function OnboardingForm({
     </div>
   )
 }
+
+export default OnboardingForm
+export { OnboardingForm }
