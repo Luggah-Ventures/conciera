@@ -1,7 +1,7 @@
 // src/app/onboarding/page.tsx
 import { redirect } from 'next/navigation'
 import { getSupabaseServerClientRSC } from '@/lib/supabase/server'
-import { OnboardingForm } from './_Form'
+import OnboardingForm from './_Form'
 
 type InstitutionRow = { id: string; title: string; notes: string | null }
 
