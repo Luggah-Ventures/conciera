@@ -1,7 +1,7 @@
 // src/components/sign-out.tsx
 import { getSupabaseServerClientAction } from '@/lib/supabase/server'
 
-export function SignOutButton() {
+export function SignOutButton({ className }: { className?: string }) {
   async function signOut() {
     'use server'
     const supabase = await getSupabaseServerClientAction()
@@ -10,7 +10,14 @@ export function SignOutButton() {
 
   return (
     <form action={signOut}>
-      <button className="text-sm underline">Sign out</button>
+      <button
+        type="submit"
+        className={`text-sm px-4 py-1.5 rounded-md bg-primary text-white hover:bg-primary/90 transition-colors ${
+          className ?? ''
+        }`}
+      >
+        Sign out
+      </button>
     </form>
   )
 }
